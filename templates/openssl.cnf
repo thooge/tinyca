@@ -15,7 +15,7 @@ RANDFILE        = $dir/.rand
 x509_extensions = client_cert
 default_days    = 365
 default_crl_days= 30
-default_md      = sha1
+default_md      = sha256
 preserve        = no
 policy          = policy_client
 
@@ -33,7 +33,7 @@ RANDFILE        = $dir/.rand
 x509_extensions = server_cert
 default_days    = 365
 default_crl_days= 30
-default_md      = sha1
+default_md      = sha256
 preserve        = no
 policy          = policy_server
 
@@ -51,7 +51,7 @@ RANDFILE        = $dir/.rand
 x509_extensions = v3_ca
 default_days    = 365
 default_crl_days= 30
-default_md      = sha1
+default_md      = sha256
 preserve        = no
 policy          = policy_ca
 

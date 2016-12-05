@@ -31,6 +31,23 @@ sub new {
 }
 
 #
+# get informations to import key from file
+#
+sub get_import_key {
+   my ($self, $main, $opts, $box) = @_;
+
+   $box->destroy() if(defined($box));
+
+   GUI::HELPERS::print_warning(_("Import Key: Function does not yet exist."));
+
+#   if(not defined($opts)) {
+#      $main->show_key_import_dialog();
+#      return;
+#   }
+
+}
+
+#
 # get name of keyfile to delete
 #
 sub get_del_key {

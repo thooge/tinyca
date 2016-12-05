@@ -29,14 +29,16 @@ my $true=1;
 # This hash maps our internal MD names to the displayed digest names.
 # Maybe it should live in a crypto-related file instead of a UI-related file?
 my %md_algorithms = (
-		     'md5' => 'MD5',
-		     'sha1' => 'SHA1',
-		     'md2' => 'MD2',
-		     'mdc2' => 'MDC2',
-		     'md4' => 'MD4',
+		     'sha256' => 'SHA-256',
+		     'md5' => 'ins.MD5',
+# n/a		     'md2' => 'MD2',
+# n/a		     'mdc2' => 'MDC2',
+		     'md4' => 'ins.MD4',
 		     'ripemd160' => 'RIPEMD-160',
 #		     'sha' => 'SHA',
-		     'sha1' => 'SHA-1',
+		     'sha1' => 'ins.SHA-1',
+		     'sha384' => 'SHA-384',
+		     'sha512' => 'SHA-512',
 		     );
 
 my %bit_lengths = (
@@ -58,7 +60,7 @@ sub new {
 
    bless($self, $class);
 
-   $self->{'version'} = '0.7.5';
+   $self->{'version'} = '0.7.6';
 
    $self->{'words'} = GUI::WORDS->new();
 
@@ -573,6 +575,12 @@ sub create_toolbar {
       
    } elsif($mode eq 'key') {
 
+      $button = Gtk2::ToolButton->new_from_stock('gtk-revert-to-saved');
+      $self->{'toolbar'}->insert($button, -1);
+      $button->set_label(_("Import"));
+      $button->signal_connect('clicked', sub {
+            $self->{'KEY'}->get_import_key($self) });
+
       $button = Gtk2::ToolButton->new_from_stock('gtk-save');
       $self->{'toolbar'}->insert($button, -1);
       $button->set_label(_("Export"));
@@ -978,7 +986,7 @@ sub create_detail_tree {
    $piter = $store->append($root);
    $store->set($piter, 0 => $t);
 
-   for my $l qw(CN EMAIL O OU C ST L) {
+   for my $l (qw(CN EMAIL O OU C ST L)) {
       if(defined($parsed->{$l})) {
          if($l eq "OU") {
             foreach my $ou (@{$parsed->{'OU'}}) {
@@ -1003,7 +1011,7 @@ sub create_detail_tree {
       $piter = $store->append($root);
       $store->set($piter, 0 => $t);
    
-      for my $l qw(CN EMAIL O OU C ST L) {
+      for my $l (qw(CN EMAIL O OU C ST L)) {
          if(defined($parsed->{'ISSUERDN'}->{$l})) {
             if($l eq "OU") {
                foreach my $ou (@{$parsed->{'ISSUERDN'}->{'OU'}}) {
@@ -1029,7 +1037,7 @@ sub create_detail_tree {
       $piter = $store->append($root);
       $store->set($piter, 0 => $t);
    
-      for my $l qw(STATUS NOTBEFORE NOTAFTER) {
+      for my $l (qw(STATUS NOTBEFORE NOTAFTER)) {
          if(defined($parsed->{$l})) {
             $citer = $store->append($piter);
             $store->set($citer, 
@@ -1045,7 +1053,7 @@ sub create_detail_tree {
    $store->set($piter, 0 => $t);
 
 
-   for my $l qw(STATUS SERIAL KEYSIZE PK_ALGORITHM SIG_ALGORITHM TYPE) {
+   for my $l (qw(STATUS SERIAL KEYSIZE PK_ALGORITHM SIG_ALGORITHM TYPE)) {
       if(defined($parsed->{$l})) {
          $citer = $store->append($piter);
          $store->set($citer, 
@@ -1060,7 +1068,7 @@ sub create_detail_tree {
       $piter = $store->append($root);
       $store->set($piter, 0 => $t);
    
-      for my $l qw(FINGERPRINTMD5 FINGERPRINTSHA1) {
+      for my $l (qw(FINGERPRINTMD5 FINGERPRINTSHA1 FINGERPRINTSHA256 FINGERPRINTSHA384 FINGERPRINTSHA512)) {
          if(defined($parsed->{$l})) {
             $citer = $store->append($piter);
             $store->set($citer, 
@@ -1171,6 +1179,7 @@ sub show_select_ca_dialog {
    );
 
    $box = GUI::HELPERS::dialog_box($t, $t, $button_ok, $button_cancel);
+   $box->set_default_size(240,320);
 
    $button_ok->grab_default();
 
@@ -1249,7 +1258,7 @@ sub show_req_dialog {
    # table for request data
    my $cc=0;
    my $ous = 1;
-   if(defined($opts->{'OU'})) {
+   if(defined($opts->{'OU'}) and ref($opts->{'OU'}) eq 'ARRAY') {
       $ous = @{$opts->{'OU'}} - 1;
    }
    $reqtable = Gtk2::Table->new(1, 13 + $ous, 0);
@@ -1297,7 +1306,7 @@ sub show_req_dialog {
          _("Organization Name (eg. company):"),
          \$opts->{'O'}, $reqtable, 10, 1);
 
-   if(defined($opts->{'OU'})) {
+   if(defined($opts->{'OU'}) and ref($opts->{'OU'}) eq 'ARRAY') {
       foreach my $ou (@{$opts->{'OU'}}) {
          $entry = GUI::HELPERS::entry_to_table(
                _("Organizational Unit Name (eg. section):"),
@@ -1617,6 +1626,17 @@ sub show_ca_export_dialog {
 }
 
 #
+# get filename for importing keys
+#
+sub show_key_import_dialog {
+   my ($self, $opts) = @_;
+
+   # my $opts = {};
+   my($box, $button_ok, $button_cancel, $button, $entry, $table, $label);
+
+}
+
+#
 # get password for exporting keys
 #
 sub show_key_nopasswd_dialog {
@@ -1746,6 +1766,7 @@ sub show_export_dialog {
    }
    
    $box = GUI::HELPERS::dialog_box($title, $text, $button_ok, $button_cancel);
+   $box->set_default_size(640, -1);
 
    # small table for file selection
    $table = Gtk2::Table->new(1, 3, 0);
@@ -1753,7 +1774,7 @@ sub show_export_dialog {
    $box->vbox->add($table);
 
    $label = GUI::HELPERS::create_label(_("File:"), 'left', 0, 0);
-   $table->attach_defaults($label, 0, 1, 0, 1);
+   $table->attach($label, 0, 1, 0, 1, 'fill', 'fill', 0, 0);
 
    if($mode eq 'cert') {
       $t = _("Export Certificate");
@@ -1773,7 +1794,7 @@ sub show_export_dialog {
    $button->signal_connect('clicked' => 
          sub{GUI::HELPERS::browse_file(
             $t, $fileentry, 'save')});
-   $table->attach_defaults($button, 2, 3, 0, 1);
+   $table->attach($button, 2, 3, 0, 1, 'fill', 'fill', 0, 0);
 
    $label = GUI::HELPERS::create_label(
       _("Export Format:"), 'center', 0, 0);
@@ -2521,12 +2542,14 @@ sub about {
    my ($aboutdialog, $href, $label);
 
    $aboutdialog = Gtk2::AboutDialog->new();
-   $aboutdialog->set_name("TinyCA2");
+   $aboutdialog->set_program_name("TinyCA2");
    $aboutdialog->set_version($main->{'version'});
    $aboutdialog->set_copyright("2002-2006 Stephan Martin");
    $aboutdialog->set_license("GNU Public License (GPL)");
    $aboutdialog->set_website("http://tinyca.sm-zone.net/");
-   $aboutdialog->set_authors("Stephan Martin <sm\@sm-zone.net>");
+   $aboutdialog->set_authors(
+         "Stephan Martin <sm\@sm-zone.net>"."\n".
+         "Thomas Hooge <thomas\@hoogi.de>");
    $aboutdialog->set_translator_credits(
          _("Czech: Robert Wolf <gentoo\@slave.umbr.cas.cz>")."\n".
          _("Swedish: Daniel Nylander <yeager\@lidkoping.net>")."\n".
@@ -2534,6 +2557,8 @@ sub about {
          _("French: Thibault Le Meur <Thibault.Lemeur\@supelec.fr>"));
 
    $aboutdialog->show_all();
+   $aboutdialog->run;
+   $aboutdialog->destroy;
 
    return;
 }
@@ -2634,7 +2659,7 @@ sub show_req_date_warning {
 
    my ($box, $button_ok, $button_cancel, $t);
 
-   $t = _("The Certificate will be longer valid than your CA!");
+   $t = _("The certificate will be valid longer than its CA!");
    $t .= "\n";
    $t .= _("This may cause problems with some software!!");
 
@@ -3088,18 +3113,21 @@ sub _create_req_menu {
 
 sub _fill_radiobox {
    my($radiobox, $var, %values) = @_;
-   my($previous_key, $value);
+   my($active_key, $previous_key, $value);
 
+   $active_key = undef;
    $previous_key = undef;
-   for $value (keys %values) {
+   for $value (sort keys %values) {
       my $display_name = $values{$value};
       my $key = Gtk2::RadioButton->new($previous_key, $display_name);
-      $key->set_active(1) if(defined($$var) && $$var eq $value);
+      #$key->set_active(1) if(defined($$var) && $$var eq $value);
+      $active_key = $key if(defined($$var) && $$var eq $value);
       $key->signal_connect('toggled' =>
 			   sub{GUI::CALLBACK::toggle_to_var($key, $var, $value)});
       $radiobox->add($key);
       $previous_key = $key;
    }
+   $active_key->set_active(1) if ($active_key);
 }
 
 1
