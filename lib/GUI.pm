@@ -510,15 +510,15 @@ sub create_toolbar {
    
       $button = Gtk2::ToolButton->new_from_stock('gtk-save');
       $self->{'toolbar'}->insert($button, -1);
-      $button->set_label(_("Export CA Certificate"));
-      $button->set_tooltip($self->{'tooltips'}, _("Export CA"), "");
+      $button->set_label(_("Export CA"));
+      $button->set_tooltip($self->{'tooltips'}, _("Export CA certificate"), "");
       $button->signal_connect('clicked', sub {
             $self->{'CA'}->export_ca_cert($self)});
    
       $button = Gtk2::ToolButton->new_from_stock('gtk-save');
       $self->{'toolbar'}->insert($button, -1);
-      $button->set_label(_("Export certificate revocation list"));
-      $button->set_tooltip($self->{'tooltips'}, _("Export CRL"), "");
+      $button->set_label(_("Export CRL"));
+      $button->set_tooltip($self->{'tooltips'}, _("Export certificate revocation list"), "");
       $button->signal_connect('clicked', sub {
             $self->{'CA'}->export_crl($self)});
       
@@ -526,6 +526,7 @@ sub create_toolbar {
          $button = Gtk2::ToolButton->new_from_stock('gtk-save');
          $self->{'toolbar'}->insert($button, -1);
          $button->set_label(_("Export Chain"));
+         $button->set_tooltip($self->{'tooltips'}, _("Export Chain"), "");
          $button->signal_connect('clicked', sub {
                $self->{'CA'}->export_ca_chain($self)});
       }
