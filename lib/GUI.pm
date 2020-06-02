@@ -1002,7 +1002,9 @@ sub create_detail_tree {
    $tree_scrolled->add_with_viewport($tree);
 
    $t = $mode eq 'req'?_("Request Details"):_("Certificate Details"); 
-   $t .= " - $parsed->{'CN'}";
+   if (defined $parsed->{'CN'}) {
+      $t .= " - $parsed->{'CN'}";
+   }
    
    $root = $store->append(undef);
    $store->set($root, 0 => $t);

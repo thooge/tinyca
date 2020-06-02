@@ -505,11 +505,11 @@ sub add_info {
     if ($self->{'mode'} eq 'cert') { 
        $parsed = $self->{'main'}->{'CERT'}->parse_cert($self->{'main'}, $dn,
              $false);
-       $title="Certificate Information";
+       $title = _("Certificate Information");
     } else {
       $parsed = $self->{'main'}->{'REQ'}->parse_req($self->{'main'}, $dn,
             $false);
-      $title="Request Information";
+      $title = _("Request Information");
     }
 
     defined($parsed) || GUI::HELPERS::print_error(_("Can't read file"));
