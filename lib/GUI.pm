@@ -119,7 +119,7 @@ sub new {
    $self->{'cursor'}     = Gtk2::Gdk::Cursor->new('left-ptr');
    $self->{'rootwin'}    = Gtk2::Gdk->get_default_root_window();
 
-   # split window horizontal to add menu, toolbar and notebook
+   # split window to add menu, toolbar and notebook
    $self->{'mvb'} = Gtk2::VBox->new();
    $self->{'mw'}->add($self->{'mvb'});
 
@@ -130,9 +130,7 @@ sub new {
    $self->{'mvb'}->pack_start($self->{'toolbar'}, 0, 0, 0);
    
    $self->create_nb();
-   $self->{'sizebox'} = Gtk2::VBox->new();
-   $self->{'mvb'}->pack_start($self->{'sizebox'}, 1, 1, 0);
-   $self->{'sizebox'}->pack_start($self->{'nb'}, 1, 1, 0);
+   $self->{'mvb'}->pack_start($self->{'nb'}, 1, 1, 0);
 
    $self->create_bar();
    $self->{'mvb'}->pack_start($self->{'barbox'}, 0, 0, 0);
@@ -379,8 +377,8 @@ sub create_bar {
 
    $self->{'barbox'}->pack_start($self->{'bar'}, 1, 1, 0);
 
-   GUI::HELPERS::set_status($self, "   Watch out...");
-      
+   GUI::HELPERS::set_status($self, _("   Watch out..."));
+
    return;
 }
 
@@ -2244,7 +2242,6 @@ sub show_req_sign_dialog {
    if($self->{'OpenSSL'}->{'version'} !~ /^0\.9\.[0-6][a-z]?$/) {
       $radiobox = Gtk2::HBox->new(0, 0);
       $key1 = Gtk2::RadioButton->new(undef, _("Yes"));
-      $key1->set_active(1);
       $key1->signal_connect('toggled' =>
            sub{GUI::CALLBACK::toggle_to_var($key1, \$opts->{'noemaildn'}, 0)});
       $radiobox->add($key1);
@@ -2253,7 +2250,14 @@ sub show_req_sign_dialog {
       $key2->signal_connect('toggled' =>
            sub{GUI::CALLBACK::toggle_to_var($key2, \$opts->{'noemaildn'}, 1)});
       $radiobox->add($key2);
-            
+
+      # For server set default to 'no'
+      if($opts->{'type'} eq 'server') {
+         $key2->set_active(1);
+      }else{
+         $key1->set_active(1);
+      }
+
       $label = GUI::HELPERS::create_label(
             _("Add eMail Address to Subject DN:"), 'left', 0, 0);
       $table->attach_defaults($label, 0, 1, $rows, $rows+1);
@@ -2575,7 +2579,7 @@ sub about {
    $aboutdialog->set_version($main->{'version'});
    $aboutdialog->set_copyright("2002-2006 Stephan Martin");
    $aboutdialog->set_license("GNU Public License (GPL)");
-   $aboutdialog->set_website("http://tinyca.sm-zone.net/");
+   $aboutdialog->set_website("https://www.hoogi.de/tinyca/");
    $aboutdialog->set_authors(
          "Stephan Martin <sm\@sm-zone.net>"."\n".
          "Thomas Hooge <thomas\@hoogi.de>");
