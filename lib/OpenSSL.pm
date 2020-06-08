@@ -557,6 +557,8 @@ sub parsecert {
    my $tmp   = {};
    my (@lines, $dn, $i, $c, $v, $k, $cmd, $crl, $time, $t, $ext, $ret, $pid);
 
+   my($rdfh, $wtfh);
+
    $time = time();
 
    $force && delete($self->{'CACHE'}->{$file});
@@ -632,6 +634,21 @@ sub parsecert {
       }
    }   
 
+   # no serial yet? get it now the direct way
+   if(!defined $tmp->{'SERIAL'}){
+      $cmd = "$self->{'bin'} x509 -noout -serial -in $file";
+      $ext = "$cmd\n\n";
+      $pid = open3($wtfh, $rdfh, $rdfh, $cmd);
+      while(<$rdfh>){
+         $ext .= $_;
+         ($k, $v) = split(/=/);
+         $tmp->{'SERIAL'} = $v if($k =~ /serial/i);
+         chomp($tmp->{'SERIAL'});
+      }
+      waitpid($pid, 0);
+      $ret = $? >> 8;
+   }
+
    # parse subject DN
    $dn = HELPERS::parse_dn($tmp->{'DN'});
    foreach(keys(%$dn)) { 
@@ -646,7 +663,6 @@ sub parsecert {
 
    # get fingerprint 
    $cmd = "$self->{'bin'} x509 -noout -fingerprint -md5 -in $file";
-   my($rdfh, $wtfh);
    $ext = "$cmd\n\n";
    $pid = open3($wtfh, $rdfh, $rdfh, $cmd);
    while(<$rdfh>){
@@ -1058,6 +1074,9 @@ sub _set_expired {
    my @lines = <IN>;
 
    close IN;
+
+   # Format of OpenSSl index db
+   # E|R|V<tab>Expiry<tab>[RevocationDate]<tab>Serial<tab>unknown<tab>SubjectDN
 
    open(OUT, ">$index") || do {
       my $t = sprintf(_("Can't write index %s: %s"), $index, $!);
