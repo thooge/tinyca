@@ -75,6 +75,7 @@ sub print_warning {
 
    $box = Gtk2::MessageDialog->new(
          undef, [qw/destroy-with-parent modal/], 'warning', 'none', $t);
+   $box->set_title(_("Warning"));
    $box->set_default_size(600, 0);
    $box->set_resizable(1);
 
