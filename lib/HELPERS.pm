@@ -113,8 +113,8 @@ sub parse_dn {
       ($k, $v) = split(/=/);
       next if(not defined($k));
       # trim key and value
-      $k = s/^\s+|\s+$//g;
-      $v = s/^\s+|\s+$//g;
+      $k =~ s/^\s+|\s+$//g;
+      $v =~ s/^\s+|\s+$//g;
       if($k =~ /ou/i) {
          $tmp->{'OU'} or  $tmp->{'OU'} = [];
          push(@{$tmp->{'OU'}}, $v);
