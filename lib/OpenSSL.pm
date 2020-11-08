@@ -42,8 +42,12 @@ sub new {
    close(TEST);
 
    # set version (format: e.g. 0.9.7 or 0.9.7a)
-   if($v =~ /\b(0\.9\.[6-9][a-z]?)\b/ || $v =~ /\b(1\.0\.[01][a-z]?)\b/) {
+   if($v =~ /\b(0\.\d\.\d[a-z]?)\b/) {
       $self->{'version'} = $1;
+   } else {
+      chomp $v;
+      print STDERR "Can't get OpenSSL version from '$v'\n";
+      $self->{'version'} = '*unknown*';
    }
 
    # CRL output was broken before openssl 0.9.7f   
@@ -1060,6 +1064,11 @@ sub read_index {
    }
 
    return(@index);
+}
+
+sub get_version {
+   my $self = shift;
+   return($self->{'version'});
 }
 
 sub _set_expired {
