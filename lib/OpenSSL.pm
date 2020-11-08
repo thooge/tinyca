@@ -42,7 +42,7 @@ sub new {
    close(TEST);
 
    # set version (format: e.g. 0.9.7 or 0.9.7a)
-   if($v =~ /\b(0\.\d\.\d[a-z]?)\b/) {
+   if($v =~ /\b(\d\.\d\.\d[a-z]?)\b/) {
       $self->{'version'} = $1;
    } else {
       chomp $v;
