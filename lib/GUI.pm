@@ -1658,9 +1658,84 @@ sub show_ca_export_dialog {
 sub show_key_import_dialog {
    my ($self, $opts) = @_;
 
-   # my $opts = {};
-   my($box, $button_ok, $button_cancel, $button, $entry, $table, $label);
+   my ($box, $button_ok, $button_cancel, $button, $entry, $table, $label);
+   my ($t, $fileentry);
 
+   $button_ok = Gtk2::Button->new_from_stock('gtk-ok');
+   $button_ok->signal_connect('clicked',
+      sub { $self->{'KEY'}->get_import_key($self, $opts, $box) });
+
+   $button_cancel = Gtk2::Button->new_from_stock('gtk-cancel');
+   $button_cancel->signal_connect('clicked', sub { $box->destroy() });
+
+   $box = GUI::HELPERS::dialog_box(
+         $self->{'CA'}->{'actca'} . ': ' . _("Import Key"),
+         _("Import Key"),
+         $button_ok, $button_cancel);
+   $box->set_default_size(640, -1);
+
+   # small table for file selection
+   $table = Gtk2::Table->new(1, 3, 0);
+   $table->set_col_spacing(0, 10);
+   $box->vbox->add($table);
+
+   $label = GUI::HELPERS::create_label(_("File:"), 'left', 0, 0);
+   $table->attach($label, 0, 1, 0, 1, 'fill', 'fill', 0, 0);
+
+   $t = _("Select key file");
+   $fileentry = Gtk2::Entry->new();
+   $fileentry->set_text($opts->{'infile'}) if(defined($opts->{'infile'}));
+   $fileentry->signal_connect( 'changed',
+         sub{ GUI::CALLBACK::entry_to_var(
+            $fileentry, $fileentry, \$opts->{'infile'})});
+   $table->attach_defaults($fileentry, 1, 2, 0, 1);
+
+   $button = Gtk2::Button->new(_("Browse..."));
+   $button->signal_connect('clicked' =>
+         sub{GUI::HELPERS::browse_file(
+            $t, $fileentry, 'key')});
+   $table->attach($button, 2, 3, 0, 1, 'fill', 'fill', 0, 0);
+
+   $label = GUI::HELPERS::create_label(_("Metadata"), 'left', 0, 1);
+   $box->vbox->add($label);
+
+   $table = Gtk2::Table->new(1, 5, 0);
+   $table->set_col_spacing(0, 7);
+   $box->vbox->add($table);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("Common Name"),
+         \$opts->{'CN'}, $table, 0, 1);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("eMail Address").":",
+         \$opts->{'EMAIL'}, $table, 1, 1);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("Country Name (2 letter code):"),
+         \$opts->{'C'}, $table, 2, 1);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("State or Province Name:"),
+         \$opts->{'ST'}, $table, 3, 1);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("Locality Name (eg. city):"),
+         \$opts->{'L'}, $table, 4, 1);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("Organization Name (eg. company):"),
+         \$opts->{'O'}, $table, 5, 1);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("Organizational Unit Name (eg. section):"),
+         \$opts->{'OU'}, $table, 6, 1);
+
+   # Hint: We don't need the password for import
+
+   $box->show_all();
+
+   return;
 }
 
 #

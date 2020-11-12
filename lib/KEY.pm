@@ -31,20 +31,41 @@ sub new {
 }
 
 #
-# get informations to import key from file
+# import key from file
 #
 sub get_import_key {
    my ($self, $main, $opts, $box) = @_;
+   my ($name, $keyfile, $ca, $cadir);
 
    $box->destroy() if(defined($box));
 
-   GUI::HELPERS::print_warning(_("Import Key: Function does not yet exist."));
+   if(not defined($opts)) {
+      $main->show_key_import_dialog();
+      return;
+   }
 
-#   if(not defined($opts)) {
-#      $main->show_key_import_dialog();
-#      return;
-#   }
+   $name = HELPERS::gen_name($opts);
+   $opts->{'keyname'} = HELPERS::enc_base64($name);
 
+   $ca = $main->{'CA'}->{'actca'};
+   $cadir = $main->{'CA'}->{$ca}->{'dir'};
+   $keyfile = $cadir . "/keys/" . $opts->{'keyname'} . ".pem";
+
+   # TODO: Check if valid key, key with password?
+   if (not -s $opts->{'infile'}) {
+	   GUI::HELPERS::print_warning(_("Key not found: ") . $opts->{'infile'});
+	   return;
+   }
+   if (not -e $keyfile) {
+      copy($opts->{'infile'}, $keyfile);
+      $main->{'keybrowser'}->update($cadir."/keys",
+                                    $cadir."/crl/crl.pem",
+                                    $cadir."/index.txt",
+                                    0);
+   } else {
+      GUI::HELPERS::print_warning(_("Key file already exists: ".$keyfile));
+   }
+   return;
 }
 
 #
