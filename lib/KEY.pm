@@ -19,6 +19,7 @@
 use strict;
 
 package KEY;
+use File::Copy qw(copy);
 
 use POSIX;
 

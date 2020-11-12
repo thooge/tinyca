@@ -1278,7 +1278,7 @@ sub show_req_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Create Request"), 
+         $self->{'CA'}->{'actca'} . ': ' . _("Create Request") , 
          _("Create a new Certificate Request"),
          $button_ok, $button_cancel);
 
@@ -1392,7 +1392,7 @@ sub show_cert_revoke_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Revoke Certificate"), _("Revoke Certificate"),
+         $self->{'CA'}->{'actca'} . ': ' . _("Revoke Certificate"), _("Revoke Certificate"),
          $button_ok, $button_cancel);
 
    # small table for data
@@ -1452,7 +1452,7 @@ sub show_crl_export_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Export CRL"), _("Export Revocation List to File"),
+         $self->{'CA'}->{'actca'} . ': ' . _("Export CRL"), _("Export Revocation List to File"),
          $button_ok, $button_cancel);
 
    # small table for file selection
@@ -1540,7 +1540,7 @@ sub show_ca_chain_export_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Export CA Certificate Chain"), 
+         $self->{'CA'}->{'actca'} . ': ' . _("Export CA Certificate Chain"), 
          _("Export CA Certificate Chain to File"),
          $button_ok, $button_cancel);
 
@@ -1587,7 +1587,7 @@ sub show_ca_export_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Export CA Certificate"), 
+         $self->{'CA'}->{'actca'} . ': ' . _("Export CA Certificate"), 
          _("Export CA Certificate to File"),
          $button_ok, $button_cancel);
 
@@ -1754,7 +1754,7 @@ sub show_key_nopasswd_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Export Key without Passphrase"), 
+         $self->{'CA'}->{'actca'} . ': ' . _("Export Key without Passphrase"), 
          _("Export Key without Passphrase"),
          $button_ok, $button_cancel);
 
@@ -1798,7 +1798,7 @@ sub show_req_import_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Import Request"), _("Import Request from File"),
+         $self->{'CA'}->{'actca'} . ': ' . _("Import Request"), _("Import Request from File"),
          $button_ok, $button_cancel);
 
    # small table for data
@@ -2113,7 +2113,7 @@ sub show_p12_export_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Export to PKCS#12"), 
+         $self->{'CA'}->{'actca'} . ': ' . _("Export to PKCS#12"), 
          _("Export to PKCS#12"),
          $button_ok, $button_cancel);
 
@@ -2205,7 +2205,7 @@ sub show_req_sign_dialog {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Sign Request"), _("Sign Request/Create Certificate"), 
+         $self->{'CA'}->{'actca'} . ': ' . _("Sign Request"), _("Sign Request/Create Certificate"), 
          $button_ok, $button_cancel);
 
    # small table for data
@@ -2653,7 +2653,7 @@ sub about {
    $aboutdialog->set_program_name("TinyCA2");
    $aboutdialog->set_version($main->{'version'});
    $aboutdialog->set_comments("using OpenSSL version " . $main->{'OpenSSL'}->get_version());
-   $aboutdialog->set_copyright("2002-2006 Stephan Martin");
+   $aboutdialog->set_copyright("2002-2006 Stephan Martin\n 2020 Thomas Hooge");
    $aboutdialog->set_license("GNU Public License (GPL)");
    $aboutdialog->set_website("https://www.hoogi.de/tinyca/");
    $aboutdialog->set_authors(
@@ -2735,7 +2735,7 @@ sub show_req_overwrite_warning {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Overwrite Request/Key"), _("Overwrite Request/Key"),
+         $self->{'CA'}->{'actca'} . ': ' . _("Overwrite Request/Key"), _("Overwrite Request/Key"),
          $button_ok, $button_cancel);
 
    $button_cancel->grab_default();
@@ -2907,7 +2907,7 @@ sub show_cert_overwrite_confirm {
    $button_cancel->signal_connect('clicked', sub { $box->destroy() });
 
    $box = GUI::HELPERS::dialog_box(
-         _("Overwrite Certificate"), _("Overwrite Certificate"),
+         $self->{'CA'}->{'actca'} . ': ' . _("Overwrite Certificate"), _("Overwrite Certificate"),
          $button_ok, $button_cancel);
 
    $button_cancel->grab_default();
@@ -2957,7 +2957,7 @@ sub show_ca_convert_dialog {
    );
 
    $box = GUI::HELPERS::dialog_box(
-         _("Convert CA"), _("Convert CA"),
+         $self->{'CA'}->{'actca'} . ': ' . _("Convert CA"), _("Convert CA"),
          $button_ok, $button_cancel);
 
    $button_ok->grab_default();
