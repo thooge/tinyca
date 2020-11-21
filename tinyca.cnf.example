@@ -1,0 +1,8 @@
+[paths]
+basedir = /var/lib/tinyca
+exportdir = /tmp
+templatedir = /usr/share/tinyaca/templates
+
+opensslbin = /usr/bin/openssl
+zipbin = /usr/bin/zip
+tarbin = /bin/tar

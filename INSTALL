@@ -2,6 +2,9 @@
 
 2. Configure the following paths for your setup. These variables 
    are located in the file tinyca itself.
+   As of version 0.7.6 these settings should be configured in
+   /etc/tinyca/tinyca.cnf. So there is no more need to modify
+   the code itself. See tinyca.cnf.example.
 
 @INC                    (location of the directory lib)
 $init->{'opensslbin'}   (location of your openssl binary)

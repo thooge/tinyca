@@ -21,10 +21,37 @@ use strict;
 package HELPERS;
 
 use POSIX;
+use Config::Tiny;
 
 my $version = "0.1";
 my $true = 1;
 my $false = undef;
+
+#
+# read global configuration file
+#
+sub read_global_cfg {
+   my $cfg = Config::Tiny->read("/etc/tinyca/tinyca.cnf", 'utf8');
+   return ($cfg);
+}
+
+#
+# read a per CA configuration
+#
+sub read_cfg {
+   my $base = shift;
+   my $cfg = Config::Tiny->read($base."/tinyca.cnf", 'utf8');
+   return ($cfg);
+}
+
+#
+# read per user configuration
+# e.g. last used ca, last window position
+#
+sub read_user_cfg {
+   my $cfg = Config::Tiny->read($ENV{HOME}."/.tinycarc", 'utf8');
+   return ($cfg);
+}
 
 # 
 # generate filename from Subject-DN

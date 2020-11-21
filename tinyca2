@@ -52,49 +52,50 @@ textdomain("tinyca2");
 # https://bugs.gentoo.org/show_bug.cgi?id=78576
 $ENV{XLIB_SKIP_ARGB_VISUALS}= '1';
 
+my $cfg = HELPERS::read_global_cfg();
 my $init = {};
 
 # location of openssl
-$init->{'opensslbin'} = "/usr/bin/openssl";
-$init->{'zipbin'} = "/usr/bin/zip";
-$init->{'tarbin'} = "/bin/tar";
+$init->{'opensslbin'} = $cfg->{paths}{opensslbin} // "/usr/bin/openssl";
+$init->{'zipbin'} = $cfg->{paths}{zipbin} // "/usr/bin/zip";
+$init->{'tarbin'} = $cfg->{paths}{tarbin} // "/bin/tar";
 
 if(not -x $init->{'opensslbin'}) {
    printf(gettext("Can't execute %s.\n"), $init->{'opensslbin'});
-   print gettext("Configure correct path to openssl in tinyca.\n");
+   print gettext("Configure correct path to openssl.\n");
    exit(1);
 }
 
 if(not -x $init->{'zipbin'}) {
    print gettext("zip command not found, support disabled.\n");
-   print gettext("Configure correct path to zip in tinyca.\n");
+   print gettext("Configure correct path to zip.\n");
 }
 
 if(not -x $init->{'tarbin'}) {
    print gettext("tar command not found, support disabled.\n");
-   print gettext("Configure correct path to tar in tinyca.\n");
+   print gettext("Configure correct path to tar.\n");
 }
 
 # directory with the templates
-$init->{'templatedir'} = "./templates";
+$init->{'templatedir'} = $cfg->{paths}{templatedir} // "./templates";
 
 if(not -d $init->{'templatedir'}) {
    print gettext("Can't find templatedir.\n");
-   print gettext("Please configure correct path with templates in tinyca.\n");
+   print gettext("Please configure correct path with templates.\n");
    exit(1);
 }
 
 # location for CA files
 if( exists $ENV{'TINYCA_BASEDIR'}) {
-   $init->{'basedir'}   = $ENV{'TINYCA_BASEDIR'}
+   $init->{'basedir'} = $ENV{'TINYCA_BASEDIR'}
 } else {
-   $init->{'basedir'}   = $ENV{HOME}."/.TinyCA";
+   $init->{'basedir'} = $cfg->{paths}{basedir} // $ENV{HOME}."/.TinyCA";
 }
 
 if( exists $ENV{'TINYCA_EXPORTDIR'}) {
    $init->{'exportdir'} = $ENV{'TINYCA_EXPORTDIR'};
 } else {
-   $init->{'exportdir'} = $ENV{HOME};
+   $init->{'exportdir'} = $cfg->{paths}{exportdir} // $ENV{HOME};
 }
 
 umask(0077);

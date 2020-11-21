@@ -119,7 +119,7 @@ sub new {
    $self->{'cursor'}     = Gtk2::Gdk::Cursor->new('left-ptr');
    $self->{'rootwin'}    = Gtk2::Gdk->get_default_root_window();
 
-   # split window to add menu, toolbar and notebook
+   # split window horizontal to add menu, toolbar and notebook
    $self->{'mvb'} = Gtk2::VBox->new();
    $self->{'mw'}->add($self->{'mvb'});
 
