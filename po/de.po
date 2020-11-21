@@ -290,7 +290,7 @@ msgstr "Fehler beim Konvertieren des Zertifikats"
 
 #: ../lib/OpenSSL.pm:662 ../lib/OpenSSL.pm:679 ../lib/OpenSSL.pm:720
 msgid "Error reading fingerprint from Certificate"
-msgstr "Fehler beim Lesen des Fingerbdrucks des Zertifikats"
+msgstr "Fehler beim Lesen des Fingerabdrucks des Zertifikats"
 
 #: ../lib/OpenSSL.pm:738
 msgid "Error reading subject from Certificate"
@@ -527,7 +527,7 @@ msgstr "   Aktuelle CA: %s - Anforderungen"
 
 #: ../lib/GUI.pm:456
 msgid "Exit TinyCA"
-msgstr "_TinyCA beenden"
+msgstr "TinyCA beenden"
 
 #: ../lib/GUI.pm:460 ../lib/GUI.pm:1178
 msgid "Open CA"
@@ -1903,7 +1903,6 @@ msgid "Fingerprint (SHA384)"
 msgstr "Fingerabdruck (SHA384)"
 
 #: ../lib/GUI/WORDS.pm:75
-#, fuzzy
 msgid "Fingerprint (SHA512)"
 msgstr "Fingerabdruck (SHA512)"
 

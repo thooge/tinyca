@@ -293,9 +293,14 @@ sub set_cursor {
 sub browse_file {
    my($title, $entry, $mode) = @_;
 
-   my($file_chooser, $filename, $filter);
+   my($file_chooser, $file_chooser_mode, $filename, $filter);
 
-   $file_chooser = Gtk2::FileChooserDialog->new ($title, undef, $mode, 
+   if($mode eq 'key') {
+	   $file_chooser_mode = 'open';
+   } else {
+	   $file_chooser_mode = $mode;
+   }
+   $file_chooser = Gtk2::FileChooserDialog->new ($title, undef, $file_chooser_mode,
          'gtk-cancel' => 'cancel', 
          'gtk-ok' => 'ok'); 
 
@@ -308,7 +313,14 @@ sub browse_file {
       $filter->add_pattern("*.der");
       $filter->add_pattern("*.req");
       $file_chooser->add_filter($filter);
-
+   } elsif($mode eq 'key') {
+      $filter = Gtk2::FileFilter->new();
+      $filter->set_name(_("Key Files (*.pem, *.key)"));
+      $filter->add_pattern("*.pem");
+      $filter->add_pattern("*.key");
+      $file_chooser->add_filter($filter);
+   }
+   if($mode eq 'open' || $mode eq 'key') {
       $filter = Gtk2::FileFilter->new();
       $filter->set_name(_("All Files (*.*)"));
       $filter->add_pattern("*");
