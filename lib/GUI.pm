@@ -2859,6 +2859,8 @@ sub show_history {
       $expdate = strftime("%F", localtime($tmp->{'EXPDATE'}));
       if(defined($tmp->{'REVDATE'})) {
          $revdate = strftime("%F", localtime($tmp->{'REVDATE'}));
+      } else {
+         $revdate = '';
       }
 
       $store->set($iter,
