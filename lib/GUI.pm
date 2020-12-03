@@ -718,7 +718,10 @@ sub create_menu {
       _("_Preferences") => {
          item_type => '<Branch>',
          children => [
-            _("Experts Only!!") => {
+            _("View") => {
+               callback    => sub { $self->show_cfg_dialog($self) },
+               item_type   => '<StockItem>',
+               extra_data  => 'gtk-info'
             },
             Separator => {
                item_type => '<Separator>',
@@ -1014,7 +1017,7 @@ sub create_detail_tree {
    if (defined $parsed->{'CN'}) {
       $t .= " - $parsed->{'CN'}";
    }
-   
+
    $root = $store->append(undef);
    $store->set($root, 0 => $t);
 
@@ -2646,6 +2649,42 @@ sub show_ca_import_dialog {
    $box->show_all();
 
    return;
+}
+
+#
+# Configuration display dialog
+#
+sub show_cfg_dialog {
+   my $self = shift;
+   my $main = shift;
+
+   my ($box, $button, $table, $label);
+
+   $box = Gtk2::Dialog->new(_("Preferences"), undef, ["destroy-with-parent"]);
+   $box->signal_connect(response => sub { $box->destroy });
+
+   $label = Gtk2::Label->new("base directory:".$main->{'init'}->{'basedir'});
+   $box->vbox->add($label);
+
+   $label = Gtk2::Label->new("export directory:".$main->{'init'}->{'exportdir'});
+   $box->vbox->add($label);
+
+   $label = Gtk2::Label->new("openssl binary:".$main->{'init'}->{'opensslbin'});
+   $box->vbox->add($label);
+
+   $label = Gtk2::Label->new("zip binary:".$main->{'init'}->{'zipbin'});
+   $box->vbox->add($label);
+
+   $label = Gtk2::Label->new("tar binary:".$main->{'init'}->{'tarbin'});
+   $box->vbox->add($label);
+
+   $button = Gtk2::Button->new_from_stock('gtk-ok');
+   $box->add_action_widget($button, 0);
+
+   $button->can_default(1);
+   $button->grab_default();
+   $box->show_all();
+
 }
 
 #

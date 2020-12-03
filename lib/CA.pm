@@ -127,6 +127,12 @@ sub open_ca {
       $main->{'exportdir'} = $dir;
    }
 
+   # read per CA configuration
+   $self->{'cfg'} = HELPERS::read_cfg($self->{'cadir'});
+   main::printd("Request-Type: " . ($self->{'cfg'}->{global}{default_req_type} // 'none'));
+   main::printd("Default bits server: " . ($self->{'cfg'}->{server}{default_bits} // 'none'));
+   main::printd("Default bits user: " . ($self->{'cfg'}->{user}{default_bits} // 'none'));
+
    # update config (necessary for update from old tinyca)
    $cnf =  $self->{$opts->{'name'}}->{'cnf'};
    open(IN, "<$cnf");
