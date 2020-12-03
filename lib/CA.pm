@@ -99,6 +99,7 @@ sub open_ca {
 
    my ($i, $cnf, @lines, $oldca, $index, $bak, $t);
 
+   main::printd("Opening ca $opts->{'name'}");
    GUI::HELPERS::set_status($main, _("  Opening CA: ").$opts->{'name'});
    while(Gtk2->events_pending) {
       Gtk2->main_iteration;

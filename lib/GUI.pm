@@ -60,6 +60,8 @@ sub new {
 
    bless($self, $class);
 
+   my ($section, $x, $y, $w, $h);
+
    $self->{'version'} = '0.7.6';
 
    $self->{'words'} = GUI::WORDS->new();
@@ -111,7 +113,16 @@ sub new {
    $self->{'mw'}->set_title("TinyCA2 Management $self->{'version'}");
 
    $self->{'mw'}->set_resizable(1);
-   $self->{'mw'}->set_default_size(850, 600);
+   $section = $self->{'init'}->{'cfg'}->{window};
+   if(defined($section->{x}) && defined($section->{y})) {
+	   # save position for later use after show_all()
+	   $self->{'posx'} = $section->{x};
+	   $self->{'posy'} = $section->{y};
+   }
+   $w = $section->{w} // 850;
+   $h = $section->{h} // 600;
+   main::printd("Sizing window to $w,$h");
+   $self->{'mw'}->set_default_size($w, $h);
    $self->{'mw'}->signal_connect( 'delete_event', 
          sub { HELPERS::exit_clean(0) });
 
@@ -1350,7 +1361,15 @@ sub show_req_dialog {
    $reqtable->attach_defaults($label, 0, 1, 13, 14);
 
    $radiobox = Gtk2::HBox->new(0, 0);
-   _fill_radiobox($radiobox, \$opts->{'bits'}, %bit_lengths);
+   # use config if present
+   main::printd("preparing radiobox for type " . $self->{'CA'}->{'cfg'}->{global}{default_req_type});
+   my $bits = \$opts->{'bits'};
+   if ($self->{'CA'}->{'cfg'}->{global}{default_req_type} eq 'user') {
+	   $bits = $self->{'CA'}->{'cfg'}->{user}{default_bits} // \$opts->{'bits'};
+   } elsif ($self->{'CA'}->{'cfg'}->{global}{default_req_type} eq 'server') {
+	   $bits = $self->{'CA'}->{'cfg'}->{server}{default_bits}// \$opts->{'bits'};
+   }
+   _fill_radiobox($radiobox, \$bits, %bit_lengths);
    $reqtable->attach_defaults($radiobox, 1, 2, 13, 14);
 
    $label = GUI::HELPERS::create_label(

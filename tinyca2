@@ -100,11 +100,20 @@ if( exists $ENV{'TINYCA_EXPORTDIR'}) {
 
 umask(0077);
 
+# read user config
+$init->{'cfg'} = HELPERS::read_user_cfg();
+$init->{'debug'} = (($cfg->{global}->{debug} // '') eq 'true') ? 1 : 0;
+printd('Debug mode enabled');
+
 # create main object and initialize CA
 my $gui = GUI->new($init);
 
 # and now run...
 $gui->{'mw'}->show_all();
+if(defined($gui->{'posx'}) && defined($gui->{'posy'})) {
+   printd("Moving window to $gui->{'posx'},$gui->{'posy'}");
+   $gui->{'mw'}->move($gui->{'posx'}, $gui->{'posy'});
+}
 
 # decide what to do on startup
 if(@{$gui->{'CA'}->{'calist'}}) {
@@ -119,7 +128,14 @@ sub _ {
    return($s);
 }
 
+sub printd {
+   print STDERR "DEBUG: @_\n" if $init->{'debug'};
+}
+
 Gtk2->main();
 
+HELPERS::update_user_cfg($gui);
+
+printd("normal exit in main");
 exit(0);
 

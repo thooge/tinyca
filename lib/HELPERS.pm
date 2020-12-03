@@ -53,6 +53,34 @@ sub read_user_cfg {
    return ($cfg);
 }
 
+sub update_user_cfg {
+   my $gui = shift;
+   my ($section);
+   my ($x, $y, $w, $h);
+
+   ($x, $y) = $gui->{'mw'}->get_position();
+   ($w, $h) = $gui->{'mw'}->get_size();
+
+   if(defined($gui->{'init'}->{'cfg'})) {
+	  $section = $gui->{'init'}->{'cfg'}->{window};
+	  $section->{x} = $x;
+	  $section->{y} = $y;
+	  $section->{w} = $w;
+	  $section->{h} = $h;
+	  $gui->{'init'}->{'cfg'}->write($ENV{HOME}."/.tinycarc", 'utf8');
+   } else {
+      # no user config yet, create new one
+      my $newcfg = Config::Tiny->new();
+      $newcfg->{window} = {
+         x => $x,
+         y => $y,
+         w => $w,
+         h => $h
+      };
+      $newcfg->write($ENV{HOME}."/.tinycarc", 'utf8');
+   }
+}
+
 # 
 # generate filename from Subject-DN
 # 

@@ -86,6 +86,11 @@ sub show_configbox {
 
    $box->add($box->{'vbox'});
 
+   # Experts warning top label
+   $label = Gtk2::Label->new();
+   $label->set_markup("<span foreground=\"red\"><b>" . _("Experts only!"). "</b></span>");
+   $box->{'vbox'}->pack_start($label, 1, 1, 8);
+
    $box->{'vbox'}->pack_start($box->{'nb'}, 1, 1, 0);
 
    $buttonbox = Gtk2::HButtonBox->new();

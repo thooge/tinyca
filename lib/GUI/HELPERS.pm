@@ -477,7 +477,8 @@ This functions returns nothing;
 
 opens a FileChooser dialog to select files or directories. $entry is a
 reference to the variable, where the selected path shall be stored. If $mode
-is set to "open", then only files with appropriate suffixes are displyed.
+is set to "open" or "key", then only files with appropriate suffixes are
+displyed.
 
 =back
 
