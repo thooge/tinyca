@@ -2731,7 +2731,7 @@ sub about {
 }
 
 #
-# get confirmation for deleting a request
+# get confirmation for deleting a request, cert or key
 #
 sub show_del_confirm {
    my ($self, $file, $type) = @_;

@@ -949,6 +949,25 @@ sub create_ca_env {
    }
    close(OUT);
 
+   # create ca config file based on template
+   $in  = $self->{'init'}->{'templatedir'}."/tinyca.cnf";
+   $out = $self->{$opts->{'name'}}->{'dir'}."/tinyca.cnf";
+   open(IN, "<$in") || do {
+      $t = sprintf(_("Can't open config template file %s %s"), $in, $!);
+      GUI::HELPERS::print_error($t);
+      return;
+   };
+   open(OUT, ">$out") || do {
+      $t = sprintf(_("Can't open config output file: %s: %s"),$out, $!);
+      GUI::HELPERS::print_error($t);
+      return;
+   };
+   while(<IN>) {
+      print OUT;
+   }
+   close(IN);
+   close(OUT);
+
    if(defined($mode) && $mode eq "sub") {
       $self->create_ca($main, $opts, undef, $mode);
    } elsif(defined($mode) && $mode eq "import") {
@@ -1386,7 +1405,7 @@ sub export_crl {
 sub _rm_dir {
    my $dir = shift;
 
-   my $dirh;
+   my ($dirh, $path);
 
    opendir($dirh, $dir);
 
@@ -1394,13 +1413,14 @@ sub _rm_dir {
       next if $f eq '.';
       next if $f eq '..';
 
-      if(-d $dir."/".$f) {
-         _rm_dir($dir."/".$f);
+      $path = $dir."/".$f;
+      if(-d $path) {
+         _rm_dir($path);
       } else {
-         unlink($dir."/".$f);
+         unlink($path);
       }
    }
-   closedir(DIR);
+   closedir($dirh);
 
    rmdir($dir);
    

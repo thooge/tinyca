@@ -452,6 +452,7 @@ sub _check_key {
       return;
    };
 
+   $type = "#ERR";
    while(<KEY>) {
       if(/RSA PRIVATE KEY/i) {
          $type = "RSA";
