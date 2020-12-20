@@ -111,6 +111,7 @@ sub new {
    # initialize main window
    $self->{'mw'} = Gtk2::Window->new("toplevel");
    $self->{'mw'}->set_title("TinyCA2 Management $self->{'version'}");
+   $self->{'mw'}->set_icon_from_file("./icons/tinyca.png");
 
    $self->{'mw'}->set_resizable(1);
    $section = $self->{'init'}->{'cfg'}->{window};
@@ -1366,13 +1367,12 @@ sub show_req_dialog {
    $radiobox = Gtk2::HBox->new(0, 0);
    # use config if present
    main::printd("preparing radiobox for type " . $self->{'CA'}->{'cfg'}->{global}{default_req_type});
-   my $bits = \$opts->{'bits'};
    if ($self->{'CA'}->{'cfg'}->{global}{default_req_type} eq 'user') {
-	   $bits = $self->{'CA'}->{'cfg'}->{user}{default_bits} // \$opts->{'bits'};
+	   $opts->{'bits'} = $self->{'CA'}->{'cfg'}->{user}{default_bits} // \$opts->{'bits'};
    } elsif ($self->{'CA'}->{'cfg'}->{global}{default_req_type} eq 'server') {
-	   $bits = $self->{'CA'}->{'cfg'}->{server}{default_bits}// \$opts->{'bits'};
+	   $opts->{'bits'} = $self->{'CA'}->{'cfg'}->{server}{default_bits}// \$opts->{'bits'};
    }
-   _fill_radiobox($radiobox, \$bits, %bit_lengths);
+   _fill_radiobox($radiobox, \$opts->{'bits'}, %bit_lengths);
    $reqtable->attach_defaults($radiobox, 1, 2, 13, 14);
 
    $label = GUI::HELPERS::create_label(
