@@ -111,7 +111,7 @@ sub new {
    # initialize main window
    $self->{'mw'} = Gtk2::Window->new("toplevel");
    $self->{'mw'}->set_title("TinyCA2 Management $self->{'version'}");
-   $self->{'mw'}->set_icon_from_file("./icons/tinyca.png");
+   $self->{'mw'}->set_icon_from_file($self->{'init'}->{'progdir'}."/icons/tinyca.png");
 
    $self->{'mw'}->set_resizable(1);
    $section = $self->{'init'}->{'cfg'}->{window};

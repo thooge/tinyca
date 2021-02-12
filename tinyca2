@@ -29,6 +29,7 @@ use MIME::Base64;
 
 use POSIX;
 use Locale::gettext;
+use File::Basename;
 
 use OpenSSL;
 use CA;
@@ -45,15 +46,17 @@ use REQ;
 use KEY;
 use TCONFIG;
 
+my $init = {};
+$init->{'progdir'} = dirname($0);
+
 setlocale(LC_MESSAGES, "");
-bindtextdomain("tinyca2", "./locale/");
+bindtextdomain("tinyca2", $init->{'progdir'}."/locale/");
 textdomain("tinyca2");
 
 # https://bugs.gentoo.org/show_bug.cgi?id=78576
 $ENV{XLIB_SKIP_ARGB_VISUALS}= '1';
 
 my $cfg = HELPERS::read_global_cfg();
-my $init = {};
 
 # location of openssl
 $init->{'opensslbin'} = $cfg->{paths}{opensslbin} // "/usr/bin/openssl";
@@ -77,7 +80,7 @@ if(not -x $init->{'tarbin'}) {
 }
 
 # directory with the templates
-$init->{'templatedir'} = $cfg->{paths}{templatedir} // "./templates";
+$init->{'templatedir'} = $cfg->{paths}{templatedir} // $init->{'progdir'}."/templates";
 
 if(not -d $init->{'templatedir'}) {
    print gettext("Can't find templatedir.\n");

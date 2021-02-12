@@ -1,3 +1,6 @@
+[global]
+debug = false
+
 [paths]
 basedir = /var/lib/tinyca
 exportdir = /tmp
