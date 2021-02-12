@@ -1761,6 +1761,109 @@ sub show_key_import_dialog {
 }
 
 #
+# check key password
+#
+sub show_key_check_dialog {
+   my ($self, $keyfile) = @_;
+
+   my ($box, $button_close, $button_check, $table, $label_result);
+   my ($entry, $passwd, $result);
+
+   $passwd = '';
+
+   $button_close = Gtk2::Button->new_from_stock('gtk-close');
+   $button_close->signal_connect('clicked', sub { $box->destroy() });
+
+   $box = GUI::HELPERS::dialog_box(
+         _("Check password"), _("Check password on private key file"),
+         $button_close);
+
+   $table = Gtk2::Table->new(2, 3, 0);
+   $table->set_col_spacing(0, 10);
+   $box->vbox->add($table);
+
+   $entry = GUI::HELPERS::entry_to_table(
+         _("Password:"),
+         \$passwd, $table, 0, 0);
+   $entry->grab_focus();
+
+   $button_check = Gtk2::Button->new(_("Check"));
+   $button_check->signal_connect('clicked', sub {
+	     $passwd =~ s/^\s+|\s+$//g;
+	     if(length($passwd) == 0) {
+		    $label_result->set_label(_("Enter password"));
+		    return;
+		 }
+         $result = $self->{'OpenSSL'}->checkpass($keyfile, $passwd);
+	     $label_result->set_label($result == 0 ? _("OK") : _("ERROR"));
+      });
+   $table->attach_defaults($button_check, 2, 3, 0, 1);
+
+   $label_result = Gtk2::Label->new("");
+   $table->attach_defaults($label_result, 1, 2, 1, 2);
+
+   $box->show_all();
+
+   return;
+}
+
+#
+# change password for key
+#
+sub show_key_passwd_dialog {
+   my ($self, $keyfile) = @_;
+
+   my ($box, $button_ok, $button_cancel, $pwtable);
+   my ($entry_old, $entry_new1, $entry_new2);
+   my ($passwd, $newpasswd, $newpasswd2, $result);
+
+   $button_ok = Gtk2::Button->new_from_stock('gtk-ok');
+   $button_ok->signal_connect('clicked', sub {
+         if($newpasswd eq $newpasswd2) {
+            $result = $self->{'KEY'}->key_change_passwd($self, $keyfile, $passwd, $newpasswd, 'key');
+            if($result == 0) {
+				main::printd("password changed");
+				$box->destroy();
+			} else {
+				 GUI::HELPERS::print_error(_("Password change failed"));
+			}
+	     } else {
+            GUI::HELPERS::print_warning(_("New password does not match"));
+         }
+      });
+
+   # $button_ok->grab_default();
+
+   $button_cancel = Gtk2::Button->new_from_stock('gtk-cancel');
+   $button_cancel->signal_connect('clicked', sub { $box->destroy() });
+
+   $box = GUI::HELPERS::dialog_box(
+         _("Change password"), _("Change password on private key file"),
+         $button_ok, $button_cancel);
+
+   $pwtable = Gtk2::Table->new(3, 2, 0);
+   $pwtable->set_col_spacing(0, 10);
+   $box->vbox->add($pwtable);
+
+   $entry_old = GUI::HELPERS::entry_to_table(
+         _("Old password:"),
+         \$passwd, $pwtable, 0, 0);
+   $entry_old->grab_focus();
+
+   $entry_new1 = GUI::HELPERS::entry_to_table(
+         _("New password:"),
+         \$newpasswd, $pwtable, 1, 0);
+   $entry_new2 = GUI::HELPERS::entry_to_table(
+         _("Confirm password:"),
+         \$newpasswd2, $pwtable, 2, 0);
+
+   $box->show_all();
+
+   return;
+
+}
+
+#
 # get password for exporting keys
 #
 sub show_key_nopasswd_dialog {
@@ -3060,15 +3163,29 @@ sub _create_key_menu {
 
    $self->{'keymenu'} = Gtk2::Menu->new();
 
+   $item = Gtk2::ImageMenuItem->new( _("Check password"));
+   $item->signal_connect(activate =>
+         sub { $self->{'KEY'}->check_passwd($self) });
+   $image = Gtk2::Image->new_from_stock('gtk-info', 'menu');
+   $item->set_image($image);
+   $self->{'keymenu'}->insert($item, -1);
+
+   $item = Gtk2::ImageMenuItem->new( _("Change password"));
+   $item->signal_connect(activate =>
+         sub { $self->{'KEY'}->set_password($self) });
+   $image = Gtk2::Image->new_from_stock('gtk-convert', 'menu');
+   $item->set_image($image);
+   $self->{'keymenu'}->insert($item, -1);
+
    $item = Gtk2::ImageMenuItem->new( _("Export Key"));
-   $item->signal_connect(activate => 
+   $item->signal_connect(activate =>
          sub { $self->{'KEY'}->get_export_key($self) });
    $image = Gtk2::Image->new_from_stock('gtk-save', 'menu');
    $item->set_image($image);
    $self->{'keymenu'}->insert($item, -1);
 
    $item = Gtk2::ImageMenuItem->new( _("Delete Key"));
-   $item->signal_connect(activate => 
+   $item->signal_connect(activate =>
          sub { $self->{'KEY'}->get_del_key($self) });
    $image = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
    $item->set_image($image);

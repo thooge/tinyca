@@ -473,8 +473,65 @@ sub _check_key {
    return($name);
 }
 
+#
+# Check password
+#
+sub check_passwd {
+   my ($self, $main) = @_;
+
+   my ($keyname, $key, $keyfile);
+
+   $key = $main->{'keybrowser'}->selection_dn();
+
+   if(not defined $key) {
+      GUI::HELPERS::print_info(_("Please select a Key first"));
+      return;
+   }
+
+   $keyname = HELPERS::enc_base64($key);
+   $keyfile = $main->{'cadir'}."/keys/".$keyname.".pem";
+
+   if(not -s $keyfile) {
+      GUI::HELPERS::print_warning(_("Key file not found:".$keyfile));
+      return;
+   }
+
+   $main->show_key_check_dialog($keyfile);
+
+   return;
+}
+
+#
+# Set new password for key
+#
+sub set_password {
+   my ($self, $main) = @_;
+
+   my ($keyname, $key, $keyfile);
+
+   $key = $main->{'keybrowser'}->selection_dn();
+
+   if(not defined $key) {
+      GUI::HELPERS::print_info(_("Please select a Key first"));
+      return;
+   }
+
+   $keyname = HELPERS::enc_base64($key);
+   $keyfile = $main->{'cadir'}."/keys/".$keyname.".pem";
+
+   if(not -s $keyfile) {
+      GUI::HELPERS::print_warning(_("Key file not found:".$keyfile));
+      return;
+   }
+
+   $main->show_key_passwd_dialog($keyfile);
+
+   return;
+
+}
+
 sub key_change_passwd {
-   my ($self, $main, $file, $oldpass, $newpass) = @_;
+   my ($self, $main, $file, $oldpass, $newpass, $mode) = @_;
    my $opts = {};
    my ($t, $ret, $ext);
 
@@ -483,7 +540,7 @@ sub key_change_passwd {
 
    my($type);
 
-   # ckeck file format
+   # check file format
    open(KEY, "<$file") || do {
       $t = sprintf(_("Can't open Key file:\n%s"),
             $file);
@@ -495,7 +552,7 @@ sub key_change_passwd {
          $inform = "PEM";
          $type   = "RSA";
          last;
-      } elsif(/BEGIN RSA PRIVATE KEY/){
+      } elsif(/BEGIN DSA PRIVATE KEY/){
          $inform = "PEM";
          $type   = "DSA";
          last;
@@ -519,15 +576,28 @@ sub key_change_passwd {
    GUI::HELPERS::set_cursor($main, 0);
 
    if($ret eq 1) {
-      $t = _("Generating key failed");
-
-      if($ext =~ /unable to load Private Key/) {
-         $t .= _("The password for your old CA Key is wrong");
+      if($mode eq 'ca') {
+         $t = _("Generating key failed");
+         if($ext =~ /unable to load Private Key/) {
+            $t .= _("The password for your old CA Key is wrong");
+         }
+      } else {
+        $t = _("Change password failed");
       }
       GUI::HELPERS::print_warning(($t), $ext);
-      return($ret);
+      return(1);
    }
 
+   if($mode eq 'key') {
+      # Write out key with new password
+      open(OUT, ">$file") || do {
+         GUI::HELPERS::print_warning(sprintf(_("Can't open output file: %s: %s"), $file, $!));
+         return(1);
+      };
+      print OUT $ret;
+      close(OUT);
+      return(0);
+   }
    return($ret);
 }
 

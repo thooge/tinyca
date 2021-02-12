@@ -132,6 +132,7 @@ sub open_ca {
    main::printd("Request-Type: " . ($self->{'cfg'}->{global}{default_req_type} // 'none'));
    main::printd("Default bits server: " . ($self->{'cfg'}->{server}{default_bits} // 'none'));
    main::printd("Default bits user: " . ($self->{'cfg'}->{user}{default_bits} // 'none'));
+   main::printd("Default key cipher: " . ($self->{'cfg'}->{user}{default_cipher} // 'none'));
 
    # update config (necessary for update from old tinyca)
    $cnf =  $self->{$opts->{'name'}}->{'cnf'};
@@ -659,7 +660,7 @@ sub import_ca {
 
    $opts->{'cakeydata'} = $main->{'KEY'}->key_change_passwd(
          $main, $opts->{'cakeyfile'}, $opts->{'passwd'},
-         $opts->{'newpasswd'});
+         $opts->{'newpasswd'}, 'ca');
 
    if($opts->{'cakeydata'} eq 1) {
       return;

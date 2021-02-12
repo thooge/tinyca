@@ -989,6 +989,49 @@ sub convkey {
    return($tmp);
 }
 
+sub checkpass {
+   my ($self, $keyfile, $passwd) = @_;
+
+   my ($cmd, $ext, $ret, $pid, $type);
+
+   # Check type: RSA or DSA
+   open(KEY, "<$keyfile") || do {
+      GUI::HELPERS::print_warning(sprintf(_("Can't open Key file:\n%s"), $keyfile));
+      return(1);
+   };
+   $type = "UNKNOWN";
+   while(<KEY>) {
+      if(/BEGIN RSA PRIVATE KEY/) {
+         $type = "rsa";
+         last;
+      } elsif(/BEGIN DSA PRIVATE KEY/){
+         $type = "dsa";
+         last;
+      }
+   }
+   if($type eq "UNKNOWN") {
+      GUI::HELPERS::print_warning(_("Invalid key encryption type"));
+      return(1);
+   }
+
+   $cmd = "$self->{'bin'} $type -noout";
+   $cmd .= " -in \"$keyfile\"";
+   $cmd .= " -passin env:SSLPASS";
+
+   $ENV{'SSLPASS'} = $passwd;
+   my($rdfh, $wtfh);
+   $ext = "$cmd\n\n";
+   $pid = open3($wtfh, $rdfh, $rdfh, $cmd);
+   while(<$rdfh>) {
+      $ext .= $_;
+   }
+   waitpid($pid, 0);
+   $ret = $? >> 8;
+   delete($ENV{'SSLPASS'});
+
+   return($ret);
+}
+
 sub genp12 {
    my $self = shift;
    my $opts = { @_ };

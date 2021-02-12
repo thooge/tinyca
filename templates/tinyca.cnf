@@ -2,6 +2,7 @@
 use_metadb = no
 default_req_type = user
 default_domain = example.com
+default_cipher = aes256
 
 [server]
 default_bits = 4096
