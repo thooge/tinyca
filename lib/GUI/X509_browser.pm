@@ -273,7 +273,13 @@ sub add_list {
          $column->set_cell_data_func ($renderer, sub {
                my ($column, $cell, $model, $iter) = @_;
                $text = $model->get($iter, 7);
-               $color = $text eq _("VALID")?'green':'red';
+               if ($text eq _("VALID")) {
+                   $color = 'green';
+               } elsif ($text eq _("EXPIRING")) {
+                   $color = 'orange';
+               } else {
+                   $color = 'red';
+               }
                $cell->set (text => $text, foreground => $color);
                });
       }

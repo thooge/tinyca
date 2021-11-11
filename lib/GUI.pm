@@ -2814,7 +2814,7 @@ sub about {
    $aboutdialog->set_program_name("TinyCA2");
    $aboutdialog->set_version($main->{'version'});
    $aboutdialog->set_comments("using OpenSSL version " . $main->{'OpenSSL'}->get_version());
-   $aboutdialog->set_copyright("2002-2006 Stephan Martin\n 2020 Thomas Hooge");
+   $aboutdialog->set_copyright("2002-2006 Stephan Martin\n 2020-2021 Thomas Hooge");
    $aboutdialog->set_license("GNU Public License (GPL)");
    $aboutdialog->set_website("https://www.hoogi.de/tinyca/");
    $aboutdialog->set_authors(

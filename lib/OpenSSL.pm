@@ -775,6 +775,9 @@ sub parsecert {
          if($crl->{'ISSUER'} eq $tmp->{'ISSUER'}) {
             _set_expired($tmp->{'SERIAL'}, $indexfile);
          }
+      } elsif ($tmp->{'EXPDATE'} - $time < 608400) {
+         # cert expires in less than 7 days
+         $tmp->{'STATUS'} = _("EXPIRING");
       }
      
       if (defined($tmp->{'SERIAL'})) {
