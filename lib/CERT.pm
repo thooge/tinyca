@@ -206,7 +206,7 @@ sub get_revoke_cert {
       $cert   = $main->{'certbrowser'}->selection_dn();
       $status = $main->{'certbrowser'}->selection_status();
    
-      if($status ne _("VALID")) {
+      if($status ne _("VALID") and $status ne _("EXPIRING")) {
          $t = sprintf(_("Can't revoke Certifikate with Status: %s"), 
                $status);
          GUI::HELPERS::print_warning($t);
