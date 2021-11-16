@@ -128,7 +128,7 @@ sub read_certlist {
 sub get_renew_cert {
    my ($self, $main, $opts, $box) = @_;
 
-   my ($cert, $status, $t, $ca, $cadir);
+   my ($cert, $status, $t, $ca, $cadir, $parsed, $time);
 
    $box->destroy() if(defined($box));
 
@@ -169,7 +169,21 @@ sub get_renew_cert {
          GUI::HELPERS::print_warning($t);
          return;
       }
-   
+
+      # get default for valid days
+      $parsed = $main->{'CERT'}->parse_cert($main, 'CA');
+
+      defined($parsed) ||
+         GUI::HELPERS::print_error(_("Can't read CA certificate"));
+
+      $opts->{'days'} =
+         $main->{'TCONFIG'}->{$opts->{'type'}."_ca"}->{'default_days'};
+
+      $time = time();
+      if($opts->{'days'} > (($parsed->{'EXPDATE'}/86400) - ($time/86400))) {
+         $opts->{'days'} = int(($parsed->{'EXPDATE'}/86400) - ($time/86400));
+      }
+
       $main->show_req_sign_dialog($opts);
       return;
    }
